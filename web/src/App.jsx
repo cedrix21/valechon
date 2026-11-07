@@ -78,6 +78,25 @@ export default function App() {
       setModifierModalItem({ ...product, type: 'lechon' });
       return;
     }
+
+    // --- NEW LOGIC FOR DRINKS (Free Allowance Check) ---
+    const isFreeSize = ['8oz', '330ml', '230ml'].includes(product.size);
+    if (isFreeSize) {
+      // 1. Count how many combos are in the cart
+      const comboCount = cart.filter(item => item.name.toLowerCase().includes('combo')).reduce((sum, item) => sum + item.quantity, 0);
+      
+      // 2. Count how many free drinks are already in the cart
+      const freeDrinksUsed = cart.filter(item => item.modifiers === 'Free with Combo').reduce((sum, item) => sum + item.quantity, 0);
+      
+      // 3. If we have combos that don't have a drink yet, make it free!
+      if (freeDrinksUsed < comboCount) {
+        addToCartDirectly(product, 'Free with Combo');
+        return;
+      }
+    }
+    // ----------------------------------------------------
+
+    // If it's not a free size or no allowance left, add as a normal paid item
     addToCartDirectly(product, 'Regular');
   };
 
@@ -91,19 +110,47 @@ export default function App() {
       setCart(newCart);
     } else {
       const itemTotal = weight ? parseFloat(product.price) * weight : null;
-      setCart([...cart, { ...product, quantity: 1, weight: weight, total: itemTotal, modifiers: modifierChoice }]);
+      // If it's a free combo drink, force the price to 0
+      const finalPrice = modifierChoice === 'Free with Combo' ? 0 : product.price;
+      setCart([...cart, { ...product, price: finalPrice, quantity: 1, weight: weight, total: itemTotal, modifiers: modifierChoice }]);
     }
   };
 
-  const confirmModifier = (modifierChoice) => {
+    const confirmModifier = (modifierChoice) => {
     if (modifierModalItem.type === 'combo') {
       if (comboStep === 'spice') {
         setSelectedSpice(modifierChoice);
         setComboStep('drink');
         return;
       }
-      const finalModifier = `${selectedSpice} | ${modifierChoice}`;
-      addToCartDirectly(modifierModalItem, finalModifier);
+      
+      // Build the new cart array in one go to avoid state overwrite bugs
+      const newCart = [...cart];
+      
+      // 1. Add the combo
+      const existingComboIndex = newCart.findIndex(
+        item => item.id === modifierModalItem.id && item.modifiers === selectedSpice
+      );
+      if (existingComboIndex >= 0) {
+        newCart[existingComboIndex].quantity += 1;
+      } else {
+        newCart.push({ ...modifierModalItem, quantity: 1, weight: null, total: null, modifiers: selectedSpice });
+      }
+
+      // 2. Add the free drink
+      const drinkProduct = categories.find(c => c.name === 'Drinks')?.products.find(p => p.name === modifierChoice);
+      if (drinkProduct) {
+        const existingDrinkIndex = newCart.findIndex(
+          item => item.id === drinkProduct.id && item.modifiers === 'Free with Combo'
+        );
+        if (existingDrinkIndex >= 0) {
+          newCart[existingDrinkIndex].quantity += 1;
+        } else {
+          newCart.push({ ...drinkProduct, price: 0, quantity: 1, weight: null, total: null, modifiers: 'Free with Combo' });
+        }
+      }
+      
+      setCart(newCart);
       setModifierModalItem(null);
       setComboStep('spice');
       setSelectedSpice('');
@@ -133,6 +180,17 @@ export default function App() {
   const updateQuantity = (index, change) => {
     const newCart = [...cart];
     if (newCart[index].weight) return;
+
+    // Silently block adding extra free drinks (UI will prevent the click anyway)
+    if (change > 0 && newCart[index].modifiers === 'Free with Combo') {
+      const comboCount = cart.filter(item => item.name.toLowerCase().includes('combo')).reduce((sum, item) => sum + item.quantity, 0);
+      const freeDrinksUsed = cart.filter(item => item.modifiers === 'Free with Combo').reduce((sum, item) => sum + item.quantity, 0);
+      
+      if (freeDrinksUsed >= comboCount) {
+        return; // Stop the function
+      }
+    }
+
     newCart[index].quantity += change;
     if (newCart[index].quantity <= 0) newCart.splice(index, 1);
     setCart(newCart);
@@ -289,7 +347,13 @@ export default function App() {
                       <div className="font-bold text-white text-sm">
                         {item.name} {item.size ? `(${item.size})` : ''}
                         {item.modifiers && (
-                          <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded border uppercase tracking-wider ${item.modifiers.includes('Spicy') ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>{item.modifiers}</span>
+                          <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded border uppercase tracking-wider ${
+                            item.modifiers.includes('Spicy') 
+                              ? 'bg-red-500/20 text-red-400 border-red-500/30' 
+                              : item.modifiers.includes('Free')
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                              : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                          }`}>{item.modifiers}</span>
                         )}
                       </div>
                       {item.weight ? (
@@ -298,7 +362,19 @@ export default function App() {
                         <div className="flex items-center gap-3 mt-2">
                           <button onClick={() => updateQuantity(index, -1)} className="w-6 h-6 bg-[#1e1e24] rounded flex items-center justify-center font-bold text-gray-300 hover:text-white">-</button>
                           <span className="text-sm font-bold text-white">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(index, 1)} className="w-6 h-6 bg-[#1e1e24] rounded flex items-center justify-center font-bold text-gray-300 hover:text-white">+</button>
+                          
+                          {/* Disable the + button if it's a free drink and the allowance is maxed out */}
+                          <button 
+                            onClick={() => updateQuantity(index, 1)} 
+                            disabled={
+                              item.modifiers === 'Free with Combo' && 
+                              cart.filter(i => i.modifiers === 'Free with Combo').reduce((sum, i) => sum + i.quantity, 0) >= 
+                              cart.filter(i => i.name.toLowerCase().includes('combo')).reduce((sum, i) => sum + i.quantity, 0)
+                            }
+                            className="w-6 h-6 bg-[#1e1e24] rounded flex items-center justify-center font-bold text-gray-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            +
+                          </button>
                         </div>
                       )}
                     </div>
