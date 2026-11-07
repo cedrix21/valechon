@@ -223,7 +223,7 @@ export default function App() {
                         <img src={product.image_path ? `http://192.168.0.102:8000/storage/${product.image_path}` : getProductImage(product.name)} alt={product.name} className="w-full h-full object-cover rounded-lg" />
                       </div>
                       <div className="p-3 text-center bg-[#2a2a32] border-t border-[#353540] opacity-50">
-                        <span className="font-bold text-sm text-gray-400 block mb-1 leading-tight">{product.name}</span>
+                        <span className="font-bold text-sm text-gray-400 block mb-1 leading-tight">{product.name} {product.size ? `(${product.size})` : ''}</span>
                         <span className="text-gray-500 font-extrabold text-lg">₱{product.is_weighted ? `${parseFloat(product.price)}/kg` : parseFloat(product.price).toFixed(2)}</span>
                       </div>
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl">
@@ -241,7 +241,9 @@ export default function App() {
                       <img src={product.image_path ? `http://192.168.0.102:8000/storage/${product.image_path}` : getProductImage(product.name)} alt={product.name} className="w-full h-full object-cover rounded-lg group-hover:scale-110 transition-transform duration-300" />
                     </div>
                     <div className="p-3 lg:p-4 2xl:p-6 text-center bg-[#2a2a32] border-t border-[#353540]">
-                      <span className="font-bold text-sm lg:text-lg 2xl:text-2xl text-white block mb-1 lg:mb-2 leading-tight">{product.name}</span>
+                      <span className="font-bold text-sm lg:text-lg 2xl:text-2xl text-white block mb-1 lg:mb-2 leading-tight">
+                        {product.name} {product.size ? `(${product.size})` : ''}
+                      </span>
                       <span className="text-yellow-500 font-extrabold text-lg lg:text-xl 2xl:text-3xl">₱{product.is_weighted ? `${parseFloat(product.price)}/kg` : parseFloat(product.price).toFixed(2)}</span>
                     </div>
                   </button>
@@ -285,7 +287,7 @@ export default function App() {
                   <li key={index} className="flex justify-between items-center bg-[#353540] p-3 rounded-xl border border-[#404050]">
                     <div className="flex-1">
                       <div className="font-bold text-white text-sm">
-                        {item.name} 
+                        {item.name} {item.size ? `(${item.size})` : ''}
                         {item.modifiers && (
                           <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded border uppercase tracking-wider ${item.modifiers.includes('Spicy') ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>{item.modifiers}</span>
                         )}

@@ -218,7 +218,9 @@ export default function Admin() {
                   
                   {/* Name & Category (Flex row on mobile) */}
                   <div className="md:col-span-3 flex justify-between md:block items-start">
-                    <span className="font-bold text-white text-base md:text-sm">{product.name}</span>
+                    <span className="font-bold text-white text-base md:text-sm">
+                      {product.name} {product.size ? `(${product.size})` : ''}
+                    </span>
                     <span className="md:hidden text-xs text-gray-400 bg-[#1e1e24] px-2 py-1 rounded">{product.category?.name || 'N/A'}</span>
                   </div>
                   
@@ -354,13 +356,18 @@ export default function Admin() {
                 </div>
                 <div>
                   <label className="block text-gray-400 font-bold mb-1 text-sm">Size (Optional)</label>
-                  <input 
-                    type="text" 
+                  <select 
                     className="w-full bg-[#1e1e24] border border-[#404050] rounded-xl p-2 text-white focus:border-yellow-500 focus:outline-none"
-                    placeholder="e.g. 8oz, 12oz"
                     value={newProduct.size}
                     onChange={(e) => setNewProduct({...newProduct, size: e.target.value})}
-                  />
+                  >
+                    <option value="">No Size (Standard)</option>
+                    <option value="8oz">8oz</option>
+                    <option value="12oz">12oz</option>
+                    <option value="330ml">330ml</option>
+                    <option value="230ml">230ml</option>
+                    <option value="1000ml">1000ml</option>
+                  </select>
                 </div>
               </div>
 
