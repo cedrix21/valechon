@@ -359,7 +359,16 @@ export default function Admin() {
                   <select 
                     className="w-full bg-[#1e1e24] border border-[#404050] rounded-xl p-2 text-white focus:border-yellow-500 focus:outline-none"
                     value={newProduct.size}
-                    onChange={(e) => setNewProduct({...newProduct, size: e.target.value})}
+                    onChange={(e) => {
+                      const selectedSize = e.target.value;
+                      // Auto-check if 8oz, 330ml, or 230ml
+                      const isFreeSize = ['8oz', '330ml', '230ml'].includes(selectedSize);
+                      setNewProduct({
+                        ...newProduct, 
+                        size: selectedSize,
+                        is_free_with_combo: isFreeSize
+                      });
+                    }}
                   >
                     <option value="">No Size (Standard)</option>
                     <option value="8oz">8oz</option>
@@ -374,18 +383,24 @@ export default function Admin() {
 
                             {/* Checkboxes Side-by-Side */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 bg-[#1e1e24] p-2 rounded-xl border border-[#404050]">
-                  <input 
-                    type="checkbox" 
-                    id="is_free_with_combo"
-                    className="w-5 h-5 accent-yellow-500"
-                    checked={newProduct.is_free_with_combo}
-                    onChange={(e) => setNewProduct({...newProduct, is_free_with_combo: e.target.checked})}
-                  />
-                  <label htmlFor="is_free_with_combo" className="text-xs text-gray-300 font-semibold cursor-pointer">
-                    Free with Combo?
-                  </label>
-                </div>
+                {(() => {
+                  const isFreeSize = ['8oz', '330ml', '230ml'].includes(newProduct.size);
+                  return (
+                    <div className={`flex items-center gap-3 p-2 rounded-xl border border-[#404050] ${isFreeSize ? 'bg-green-900/20 opacity-70' : 'bg-[#1e1e24]'}`}>
+                      <input 
+                        type="checkbox" 
+                        id="is_free_with_combo"
+                        className="w-5 h-5 accent-yellow-500 disabled:opacity-50"
+                        checked={newProduct.is_free_with_combo}
+                        disabled={isFreeSize}
+                        onChange={(e) => setNewProduct({...newProduct, is_free_with_combo: e.target.checked})}
+                      />
+                      <label htmlFor="is_free_with_combo" className={`text-xs font-semibold ${isFreeSize ? 'text-green-400' : 'text-gray-300'}`}>
+                        {isFreeSize ? `Auto-Free (${newProduct.size})` : 'Free with Combo?'}
+                      </label>
+                    </div>
+                  );
+                })()}
 
                 <div className="flex items-center gap-3 bg-[#1e1e24] p-2 rounded-xl border border-[#404050]">
                   <input 

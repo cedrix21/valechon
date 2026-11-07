@@ -383,7 +383,7 @@ export default function App() {
               </div>
             ) : modifierModalItem.type === 'combo' && comboStep === 'drink' ? (
               <div className="grid grid-cols-2 gap-4 mb-4">
-                {categories.find(c => c.name === 'Drinks')?.products.filter(p => p.size === '8oz').map(drink => (
+                {categories.find(c => c.name === 'Drinks')?.products.filter(p => ['8oz', '330ml', '230ml'].includes(p.size)).map(drink => (
                   <button 
                     key={drink.id} 
                     onClick={() => confirmModifier(drink.name)} 
@@ -392,8 +392,8 @@ export default function App() {
                     {drink.name} {drink.size ? `(${drink.size})` : ''}
                   </button>
                 ))}
-                {categories.find(c => c.name === 'Drinks')?.products.filter(p => p.size === '8oz').length === 0 && (
-                  <p className="text-gray-500 col-span-2 text-center py-4">No 8oz drinks available for combos.</p>
+                {categories.find(c => c.name === 'Drinks')?.products.filter(p => ['8oz', '330ml', '230ml'].includes(p.size)).length === 0 && (
+                  <p className="text-gray-500 col-span-2 text-center py-4">No free drinks available.</p>
                 )}
               </div>
             ) : (
