@@ -24,9 +24,3 @@ dist-ssr
 *.sw?
 .env
 .env.local
-
-# Ignore built frontend files
-backend/public/assets/
-backend/public/index.html
-backend/public/favicon.svg
-backend/public/icons.svg

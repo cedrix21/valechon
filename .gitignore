@@ -1,0 +1,5 @@
+# Ignore built frontend files inside Laravel
+backend/public/assets/
+backend/public/index.html
+backend/public/favicon.svg
+backend/public/icons.svg
