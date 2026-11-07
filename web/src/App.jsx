@@ -231,9 +231,9 @@ export default function App() {
     <div className="h-[100dvh] w-full flex flex-col bg-[#1e1e24] font-sans overflow-hidden text-gray-200 relative mx-auto max-w-[1920px]">
       
       {/* HEADER - Maroon theme */}
-      <header className="bg-[#7b1e23] px-4 py-3 lg:px-8 lg:py-4 flex flex-col lg:flex-row justify-between items-center shadow-lg z-10 border-b border-[#5a1519] gap-3 lg:gap-0 w-full">
+      <header className="bg-[#7b1e23] px-4 py-2 lg:px-6 lg:py-2 flex flex-col lg:flex-row justify-between items-center shadow-lg z-10 border-b border-[#5a1519] gap-2 lg:gap-0 w-full">
         <div className="flex items-center justify-between w-full lg:w-auto gap-3 lg:gap-6">
-          <h1 className="text-3xl lg:text-4xl xl:text-5xl font-black tracking-wider text-white italic drop-shadow-md">Valéchon</h1>
+          <h1 className="text-2xl lg:text-3xl xl:text-4xl font-black tracking-wider text-white italic drop-shadow-md">Valéchon</h1>
           <span className="text-xs lg:text-sm font-bold text-gray-300 uppercase tracking-widest hidden lg:block mt-2">Sulit ug lamian</span>
           <div className="flex gap-2 ml-auto lg:ml-4">
              <a href="/report" target="_blank" className="text-xs lg:text-sm bg-[#5a1519] text-yellow-500 px-3 lg:px-5 py-1.5 lg:py-2.5 rounded-lg border border-yellow-500 hover:bg-[#4a1014] transition-colors font-bold tracking-wide shadow-sm">
@@ -249,19 +249,20 @@ export default function App() {
           <input 
             type="text" 
             placeholder="Customer Name" 
-            className="px-3 lg:px-6 py-2 lg:py-3 w-full lg:w-72 xl:w-80 rounded-xl bg-[#5a1519] text-white placeholder-gray-400 border border-[#4a1014] focus:outline-none focus:border-yellow-500 text-sm lg:text-lg xl:text-xl shadow-inner"
+            className="px-3 lg:px-4 py-2 lg:py-2 w-full lg:w-64 xl:w-72 rounded-xl bg-[#5a1519] text-white placeholder-gray-400 border border-[#4a1014] focus:outline-none focus:border-yellow-500 text-sm lg:text-base shadow-inner"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
           />
           <div className="flex bg-[#5a1519] rounded-xl p-1 lg:p-1.5 border border-[#4a1014] shadow-inner shrink-0">
             <button 
-              className={`px-4 lg:px-10 py-2 lg:py-4 rounded-lg text-xs lg:text-xl font-bold transition-all ${orderType === 'dine-in' ? 'bg-yellow-500 text-black shadow-md' : 'text-gray-300 hover:text-white'}`}
+              className={`px-4 lg:px-10 py-2 lg:py-4 rounded-lg text-xs lg:text-base font-bold transition-all ${orderType === 'dine-in' ? 'bg-yellow-500 text-black shadow-md' : 'text-gray-300 hover:text-white'}`}
               onClick={() => setOrderType('dine-in')}
             >
               DINE IN
             </button>
             <button 
-              className={`px-4 lg:px-10 py-2 lg:py-4 rounded-lg text-xs lg:text-xl font-bold transition-all ${orderType === 'takeout' ? 'bg-yellow-500 text-black shadow-md' : 'text-gray-300 hover:text-white'}`}              onClick={() => setOrderType('takeout')}
+              className={`px-4 lg:px-10 py-2 lg:py-4 rounded-lg text-xs lg:text-base font-bold transition-all ${orderType === 'takeout' ? 'bg-yellow-500 text-black shadow-md' : 'text-gray-300 hover:text-white'}`} 
+             onClick={() => setOrderType('takeout')}
             >
               TAKE OUT
             </button>
@@ -292,7 +293,7 @@ export default function App() {
         {/* CENTER: ITEM GRID */}
         <div className="flex-1 overflow-y-auto">
                     {/* Fluid Grid: Fits as many 240px cards as possible */}
-          <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3 lg:gap-5 content-start pb-24 lg:pb-6 lg:p-3 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 lg:gap-5 content-start pb-24 lg:pb-6 lg:p-3 w-full">
             {categories.find(c => c.id === activeCategory)?.products.map(product => {
               // Check if the item is a Lechon item
               const isLechon = product.name.toLowerCase().includes('lechon') && !product.is_weighted;
