@@ -1,19 +1,102 @@
 @import "tailwindcss";
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  #print-receipt, #print-receipt * {
-    visibility: visible;
-  }
-  #print-receipt {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    display: block !important;
-  }
+
+/* --- POS LAYOUT BASE (Mobile) --- */
+.pos-header {
+  background-color: #7b1e23;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #5a1519;
+  z-index: 10;
 }
-html, body {
-  overscroll-behavior-y: none; /* Stops the bounce effect on mobile */
+
+.pos-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  padding: 8px;
+  gap: 8px;
+  position: relative;
+}
+
+.pos-sidebar {
+  width: 100%;
+  background-color: #2a2a32;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  gap: 8px;
+  overflow-x: auto;
+  border: 1px solid #353540;
+  flex-shrink: 0;
+}
+
+.pos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* Mobile: 2 columns, no overflow */
+  gap: 12px;
+  width: 100%;
+  align-content: start;
+  padding-bottom: 100px; /* Space for mobile floating button */
+}
+
+.pos-cart {
+  width: 100%;
+  background-color: #2a2a32;
+  display: none; /* Hidden by default on mobile */
+  flex-direction: column;
+  border-radius: 16px;
+  border: 1px solid #353540;
+}
+
+/* Show cart on mobile ONLY when the state is open */
+.pos-cart.is-open {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+  border: none;
+}
+
+.pos-cart-header {
+  padding: 16px;
+  border-bottom: 1px solid #353540;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pos-cart-footer {
+  padding: 16px;
+  border-top: 1px solid #353540;
+  background-color: #2a2a32;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  flex-shrink: 0;
+}
+
+/* --- LAPTOP (1024px to 1535px) --- */
+@media (min-width: 1024px) {
+  .pos-header { flex-direction: row; justify-content: space-between; padding: 8px 24px; }
+  .pos-main { flex-direction: row; padding: 16px; gap: 16px; }
+  .pos-sidebar { width: 160px; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+  .pos-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; padding-bottom: 24px; }
+  .pos-cart { display: flex; width: 360px; }
+}
+
+/* --- TABLET (1536px and up) --- */
+@media (min-width: 1536px) {
+  .pos-sidebar { width: 192px; }
+  .pos-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .pos-cart { display: flex; width: 480px; }
+  .pos-cart-header h2 { font-size: 1.5rem; }
+  .pos-cart-footer .total-amount { font-size: 3rem; }
 }
