@@ -179,10 +179,11 @@ export default function App() {
 
   const updateQuantity = (index, change) => {
     const newCart = [...cart];
-    if (newCart[index].weight) return;
+    const itemToUpdate = newCart[index];
+    if (itemToUpdate.weight) return;
 
-    // Silently block adding extra free drinks (UI will prevent the click anyway)
-    if (change > 0 && newCart[index].modifiers === 'Free with Combo') {
+    // 1. Block adding extra free drinks (UI will prevent the click anyway)
+    if (change > 0 && itemToUpdate.modifiers === 'Free with Combo') {
       const comboCount = cart.filter(item => item.name.toLowerCase().includes('combo')).reduce((sum, item) => sum + item.quantity, 0);
       const freeDrinksUsed = cart.filter(item => item.modifiers === 'Free with Combo').reduce((sum, item) => sum + item.quantity, 0);
       
@@ -191,13 +192,63 @@ export default function App() {
       }
     }
 
-    newCart[index].quantity += change;
-    if (newCart[index].quantity <= 0) newCart.splice(index, 1);
+    // 2. If we are reducing a Combo Meal to 0, also remove a free drink
+    if (change < 0 && itemToUpdate.name.toLowerCase().includes('combo') && itemToUpdate.quantity === 1) {
+      const freeDrinkIndex = newCart.findIndex(item => item.modifiers === 'Free with Combo');
+      
+      if (freeDrinkIndex >= 0) {
+        // Remove the drink FIRST
+        if (newCart[freeDrinkIndex].quantity === 1) {
+          newCart.splice(freeDrinkIndex, 1);
+        } else {
+          newCart[freeDrinkIndex].quantity -= 1;
+        }
+      }
+    }
+
+    // 3. Apply the quantity change to the clicked item
+    // (Recalculate the index because the drink removal might have shifted it)
+    const updatedIndex = newCart.findIndex(item => item === itemToUpdate);
+    if (updatedIndex >= 0) {
+      newCart[updatedIndex].quantity += change;
+      if (newCart[updatedIndex].quantity <= 0) {
+        newCart.splice(updatedIndex, 1);
+      }
+    }
+
     setCart(newCart);
   };
 
   const removeFromCart = (indexToRemove) => {
-    setCart(cart.filter((_, index) => index !== indexToRemove));
+    const itemToRemove = cart[indexToRemove];
+    let newCart = [...cart];
+
+    // 1. If we are removing a Combo Meal, find and remove ONE free drink
+    if (itemToRemove.name.toLowerCase().includes('combo')) {
+      const freeDrinkIndex = newCart.findIndex(item => item.modifiers === 'Free with Combo');
+      
+      if (freeDrinkIndex >= 0) {
+        // Remove the drink FIRST
+        if (newCart[freeDrinkIndex].quantity === 1) {
+          newCart.splice(freeDrinkIndex, 1);
+        } else {
+          newCart[freeDrinkIndex].quantity -= 1;
+        }
+      }
+    }
+
+    // 2. Now remove the Combo Meal
+    // Since we might have just removed a drink, the indices have shifted.
+    // We need to find the combo again in the updated array.
+    const comboIndexInNewCart = newCart.findIndex(
+      item => item.name === itemToRemove.name && item.modifiers === itemToRemove.modifiers
+    );
+
+    if (comboIndexInNewCart >= 0) {
+      newCart.splice(comboIndexInNewCart, 1);
+    }
+
+    setCart(newCart);
   };
 
   const clearCart = () => setIsClearCartOpen(true);
