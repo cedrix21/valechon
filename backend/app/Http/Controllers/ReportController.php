@@ -31,22 +31,17 @@ class ReportController extends Controller
             ->groupBy('payment_method')
             ->get();
 
-        // 3. Get item breakdown
+                     // 3. Get item breakdown
         $itemBreakdown = OrderItem::whereBetween('order_items.created_at', [$start, $end])
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->selectRaw("
                 products.name, 
-                SUBSTRING_INDEX(order_items.modifiers, ' | ', 1) as modifiers,
+                order_items.modifiers,
                 sum(order_items.quantity) as total_qty, 
                 sum(order_items.weight_in_kg) as total_kg, 
-                sum(
-                    CASE 
-                        WHEN order_items.weight_in_kg IS NOT NULL THEN (order_items.price_at_time_of_sale * order_items.weight_in_kg)
-                        ELSE (order_items.price_at_time_of_sale * order_items.quantity)
-                    END
-                ) as total_revenue
+                sum(order_items.price_at_time_of_sale * order_items.quantity) as total_revenue
             ")
-            ->groupBy('products.id', 'products.name', DB::raw("SUBSTRING_INDEX(order_items.modifiers, ' | ', 1)"))
+            ->groupBy('products.id', 'products.name', 'order_items.modifiers')
             ->get();
 
         // 4. Get recent orders

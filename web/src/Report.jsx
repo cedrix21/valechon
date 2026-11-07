@@ -22,7 +22,7 @@ export default function Report() {
 
   // Fetch data whenever dates change
   useEffect(() => {
-    fetch(`http://192.168.0.102:8000/api/reports/daily?start_date=${startDate}&end_date=${endDate}`)
+    fetch(`http://192.168.100.96:8000/api/reports/daily?start_date=${startDate}&end_date=${endDate}`)
       .then(res => {
         if (!res.ok) throw new Error("Server error");
         return res.json();
@@ -301,13 +301,13 @@ export default function Report() {
                     <p className="font-bold text-white text-base flex items-center gap-2">
                       {item.name}
                       {/* Changed: Removed the "!== Regular" check */}
-                      {item.modifiers && (
+                      {(item.modifiers === 'Spicy' || item.modifiers === 'Regular') && (
                         <span className={`text-[10px] px-1.5 py-0.5 rounded border uppercase tracking-wider ${
-                          item.modifiers.includes('Spicy') 
+                          item.modifiers === 'Spicy' 
                             ? 'bg-red-500/20 text-red-400 border-red-500/30' 
                             : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
                         }`}>
-                          {item.modifiers.includes('Spicy') ? 'Spicy' : 'Regular'}
+                          {item.modifiers}
                         </span>
                       )}
                     </p>

@@ -25,7 +25,7 @@ export default function Admin() {
       setIsAuthenticated(true);
       fetchProducts();
       // Fetch categories for the dropdown
-      fetch('http://192.168.0.102:8000/api/menu')
+      fetch('http://192.168.100.96:8000/api/menu')
         .then(res => res.json())
         .then(data => setCategories(data));
     } else {
@@ -34,7 +34,7 @@ export default function Admin() {
   };
 
   const fetchProducts = () => {
-    fetch('http://192.168.0.102:8000/api/admin/products')
+    fetch('http://192.168.100.96:8000/api/admin/products')
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.error(err));
@@ -42,7 +42,7 @@ export default function Admin() {
 
   const toggleProduct = async (id) => {
     try {
-      const response = await fetch(`http://192.168.0.102:8000/api/admin/products/${id}/toggle`, {
+      const response = await fetch(`http://192.168.100.96:8000/api/admin/products/${id}/toggle`, {
         method: 'PATCH',
         headers: { 'Accept': 'application/json' }
       });
@@ -66,7 +66,7 @@ export default function Admin() {
     const isStillAvailable = newStock.Spicy || newStock.Regular;
 
     try {
-      const response = await fetch(`http://192.168.0.102:8000/api/admin/products/${product.id}/modifier`, {
+      const response = await fetch(`http://192.168.100.96:8000/api/admin/products/${product.id}/modifier`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ 
@@ -102,8 +102,8 @@ export default function Admin() {
 
     // Determine the URL based on whether we are editing or adding
     const url = editingProductId 
-      ? `http://192.168.0.102:8000/api/admin/products/${editingProductId}/update`
-      : 'http://192.168.0.102:8000/api/admin/products';
+      ? `http://192.168.100.96:8000/api/admin/products/${editingProductId}/update`
+      : 'http://192.168.100.96:8000/api/admin/products';
 
     try {
       const response = await fetch(url, {
@@ -134,7 +134,7 @@ export default function Admin() {
     const handleDeleteProduct = async () => {
     if (!deleteModalProduct) return;
     try {
-      const response = await fetch(`http://192.168.0.102:8000/api/admin/products/${deleteModalProduct.id}`, {
+      const response = await fetch(`http://192.168.100.96:8000/api/admin/products/${deleteModalProduct.id}`, {
         method: 'DELETE',
         headers: { 'Accept': 'application/json' }
       });

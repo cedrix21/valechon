@@ -29,7 +29,7 @@ export default function App() {
   const [isClearCartOpen, setIsClearCartOpen] = useState(false);
 
   useEffect(() => {
-    fetch('http://192.168.0.102:8000/api/menu')
+    fetch('http://192.168.100.96:8000/api/menu')
       .then(response => response.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -329,7 +329,7 @@ export default function App() {
                   <div key={product.id} className="flex flex-col cursor-not-allowed">
                     <div className="bg-[#2a2a32] rounded-xl overflow-hidden border-2 border-[#353540] shadow-md relative h-[208px] lg:h-[240px] 2xl:h-[320px]">
                       <div className="h-32 lg:h-40 2xl:h-56 bg-[#353540] overflow-hidden flex items-center justify-center p-2 opacity-50 grayscale">
-                        <img src={product.image_path ? `http://192.168.0.102:8000/storage/${product.image_path}` : getProductImage(product.name)} alt={product.name} className="w-full h-full object-cover rounded-lg" />
+                        <img src={product.image_path ? `http://192.168.100.96:8000/storage/${product.image_path}` : getProductImage(product.name)} alt={product.name} className="w-full h-full object-cover rounded-lg" />
                       </div>
                       <div className="p-3 text-center bg-[#2a2a32] border-t border-[#353540] opacity-50">
                         <span className="font-bold text-sm text-gray-400 block mb-1 leading-tight">{product.name} {product.size ? `(${product.size})` : ''}</span>
@@ -347,7 +347,7 @@ export default function App() {
                 <div key={product.id} className="flex flex-col">
                   <button onClick={() => handleItemTap(product)} className={`bg-[#2a2a32] rounded-xl overflow-hidden shadow-md border-2 transition-all group hover:-translate-y-1 ${activeWeightId === product.id ? 'border-yellow-500' : 'border-[#353540] hover:border-[#7b1e23]'}`}>
                     <div className="h-32 lg:h-40 2xl:h-56 bg-[#353540] overflow-hidden flex items-center justify-center p-2">
-                      <img src={product.image_path ? `http://192.168.0.102:8000/storage/${product.image_path}` : getProductImage(product.name)} alt={product.name} className="w-full h-full object-cover rounded-lg group-hover:scale-110 transition-transform duration-300" />
+                      <img src={product.image_path ? `http://192.168.100.96:8000/storage/${product.image_path}` : getProductImage(product.name)} alt={product.name} className="w-full h-full object-cover rounded-lg group-hover:scale-110 transition-transform duration-300" />
                     </div>
                     <div className="p-3 lg:p-4 2xl:p-6 text-center bg-[#2a2a32] border-t border-[#353540]">
                       <span className="font-bold text-sm lg:text-lg 2xl:text-2xl text-white block mb-1 lg:mb-2 leading-tight">
@@ -487,7 +487,7 @@ export default function App() {
               <button className="w-full bg-[#7b1e23] text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:bg-[#5a1519] transition-colors disabled:bg-gray-600 disabled:text-gray-400" disabled={paymentMethod === 'Cash' && (!cashTendered || parseFloat(cashTendered) < parseFloat(calculateTotal()))} onClick={async () => {
                   const orderData = { order_type: orderType, customer_name: customerName || 'Walk-in', total_amount: calculateTotal(), payment_method: paymentMethod, cash_tendered: paymentMethod === 'Cash' ? parseFloat(cashTendered) : calculateTotal(), change_amount: paymentMethod === 'Cash' ? parseFloat(calculateChange()) : 0, items: cart.map(item => ({ id: item.id, quantity: item.quantity, price: item.price, weight: item.weight, modifiers: item.modifiers })) };
                   try {
-                    const response = await fetch('http://192.168.0.102:8000/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(orderData) });
+                    const response = await fetch('http://192.168.100.96:8000/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(orderData) });
                     const data = await response.json();
                     if (response.ok) { handleOrderSuccess({ order_number: data.order_number, total: calculateTotal(), payment: paymentMethod, change: paymentMethod === 'Cash' ? calculateChange() : 0 }); }
                   } catch (error) { console.error("Error:", error); }
