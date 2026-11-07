@@ -222,38 +222,38 @@ export default function Admin() {
           <div className="w-full">
             
             {/* DESKTOP TABLE HEADER (Hidden on Mobile) */}
-            <div className="hidden md:grid grid-cols-12 text-gray-400 text-sm font-bold uppercase tracking-wider border-b border-[#353540] pb-3 px-4">
-              <div className="col-span-3">Product Name</div>
-              <div className="col-span-2">Category</div>
-              <div className="col-span-2">Price</div>
-              <div className="col-span-2 text-center">Status</div>
-              <div className="col-span-3 text-right">Action</div>
+            <div className="hidden md:flex items-center text-gray-400 text-sm font-bold uppercase tracking-wider border-b border-[#353540] pb-3 px-4">
+              <div className="w-[25%]">Product Name</div>
+              <div className="w-[15%]">Category</div>
+              <div className="w-[15%]">Price</div>
+              <div className="w-[15%] text-center">Status</div>
+              <div className="w-[30%] text-right">Action</div>
             </div>
 
             {/* PRODUCT LIST (Cards on Mobile, Rows on Desktop) */}
             <div className="divide-y divide-[#353540]">
               {products.map((product) => (
-                <div key={product.id} className="py-4 px-2 md:px-4 flex flex-col md:grid md:grid-cols-12 md:items-center hover:bg-[#353540]/30 transition-colors gap-3 md:gap-0">
+                <div key={product.id} className="py-4 px-2 md:px-4 flex flex-col md:flex-row md:items-center hover:bg-[#353540]/30 transition-colors gap-3 md:gap-0">
                   
-                  {/* Name & Category (Flex row on mobile) */}
-                  <div className="md:col-span-3 flex justify-between md:block items-start">
+                  {/* Name & Category (Mobile) */}
+                  <div className="md:w-[25%] flex justify-between md:block items-start">
                     <span className="font-bold text-white text-base md:text-sm">
                       {product.name} {product.size ? `(${product.size})` : ''}
                     </span>
                     <span className="md:hidden text-xs text-gray-400 bg-[#1e1e24] px-2 py-1 rounded">{product.category?.name || 'N/A'}</span>
                   </div>
                   
-                  {/* Category (Desktop only) */}
-                  <div className="hidden md:block md:col-span-2 text-gray-400 text-sm">{product.category?.name || 'N/A'}</div>
+                  {/* Category (Desktop) */}
+                  <div className="hidden md:block md:w-[15%] text-gray-400 text-sm">{product.category?.name || 'N/A'}</div>
                   
                   {/* Price */}
-                  <div className="md:col-span-2 font-semibold text-green-400 text-sm md:text-base">
+                  <div className="md:w-[15%] font-semibold text-green-400 text-sm md:text-base">
                     ₱{parseFloat(product.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     {product.is_weighted && '/kg'}
                   </div>
                   
                   {/* Status */}
-                  <div className="md:col-span-2 md:text-center flex md:block items-center gap-2">
+                  <div className="md:w-[15%] md:text-center flex md:block items-center gap-2">
                     <span className="text-xs text-gray-500 md:hidden uppercase font-bold">Status:</span>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                       product.is_available 
@@ -264,60 +264,63 @@ export default function Admin() {
                     </span>
                   </div>
 
-                  {/* Actions */}
-                  <div className="md:col-span-3 md:text-right mt-2 md:mt-0 flex flex-col md:flex-row justify-end gap-2 items-center">
-                    
-                    {/* Edit Button */}
-                    <button 
-                      onClick={() => openEditModal(product)}
-                      className="w-full md:w-auto px-3 py-2 rounded-lg text-sm font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30 hover:bg-blue-500 hover:text-white transition-colors"
-                    >
-                      Edit
-                    </button>
-
-                    {/* Archive Button */}
-                    <button 
-                      onClick={() => setDeleteModalProduct(product)}
-                      className="w-full md:w-auto px-3 py-2 rounded-lg text-sm font-bold bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white transition-colors"
-                    >
-                      Archive
-                    </button>
-
-                    {product.name.toLowerCase().includes('lechon') || product.name.toLowerCase().includes('combo') || product.name.toLowerCase().includes('roll') ? (
-                      <div className="flex gap-2 md:justify-end">
+                  {/* Actions - Single Dropdown Menu */}
+                  <div className="md:w-[30%] mt-2 md:mt-0 flex justify-end items-center">
+                    <details className="relative group">
+                      <summary className="list-none cursor-pointer bg-[#1e1e24] hover:bg-[#353540] border border-[#404050] text-gray-300 rounded-lg px-4 py-2 text-sm font-bold transition-colors flex items-center gap-2">
+                        Actions
+                        <svg className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                      </summary>
+                      
+                      {/* Dropdown Menu */}
+                      <div className="absolute right-0 mt-1 w-48 bg-[#2a2a32] border border-[#404050] rounded-xl shadow-2xl z-50 py-2 flex flex-col">
                         <button 
-                          onClick={() => toggleModifier(product, 'Regular')}
-                          className={`flex-1 md:flex-none px-3 py-2 md:py-1 rounded-lg text-sm font-bold border transition-colors ${
-                            (product.modifier_stock?.Regular ?? true)
-                              ? 'bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500 hover:text-white' 
-                              : 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500 hover:text-white'
-                          }`}
+                          onClick={(e) => { e.currentTarget.closest('details').removeAttribute('open'); openEditModal(product); }} 
+                          className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#353540] hover:text-white transition-colors"
                         >
-                          Reg: {(product.modifier_stock?.Regular ?? true) ? 'IN' : 'OUT'}
+                          Edit Product
                         </button>
+                        
                         <button 
-                          onClick={() => toggleModifier(product, 'Spicy')}
-                          className={`flex-1 md:flex-none px-3 py-2 md:py-1 rounded-lg text-sm font-bold border transition-colors ${
-                            (product.modifier_stock?.Spicy ?? true)
-                              ? 'bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500 hover:text-white' 
-                              : 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500 hover:text-white'
-                          }`}
+                          onClick={(e) => { e.currentTarget.closest('details').removeAttribute('open'); setDeleteModalProduct(product); }} 
+                          className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
                         >
-                          Spicy: {(product.modifier_stock?.Spicy ?? true) ? 'IN' : 'OUT'}
+                          Archive Product
                         </button>
+
+                        <div className="h-px bg-[#404050] my-1"></div>
+
+                        {product.name.toLowerCase().includes('lechon') || product.name.toLowerCase().includes('combo') || product.name.toLowerCase().includes('roll') ? (
+                          <>
+                            <button 
+                              onClick={(e) => { e.currentTarget.closest('details').removeAttribute('open'); toggleModifier(product, 'Regular'); }} 
+                              className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#353540] hover:text-white transition-colors flex justify-between"
+                            >
+                              Regular Flavor 
+                              <span className={(product.modifier_stock?.Regular ?? true) ? 'text-green-400' : 'text-red-400'}>
+                                {(product.modifier_stock?.Regular ?? true) ? 'IN' : 'OUT'}
+                              </span>
+                            </button>
+                            <button 
+                              onClick={(e) => { e.currentTarget.closest('details').removeAttribute('open'); toggleModifier(product, 'Spicy'); }} 
+                              className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#353540] hover:text-white transition-colors flex justify-between"
+                            >
+                              Spicy Flavor 
+                              <span className={(product.modifier_stock?.Spicy ?? true) ? 'text-green-400' : 'text-red-400'}>
+                                {(product.modifier_stock?.Spicy ?? true) ? 'IN' : 'OUT'}
+                              </span>
+                            </button>
+                          </>
+                        ) : (
+                          <button 
+                            onClick={(e) => { e.currentTarget.closest('details').removeAttribute('open'); toggleProduct(product.id); }} 
+                            className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#353540] hover:text-white transition-colors"
+                          >
+                            {product.is_available ? 'Mark Out of Stock' : 'Mark Available'}
+                          </button>
+                        )}
                       </div>
-                    ) : (
-                      <button 
-                        onClick={() => toggleProduct(product.id)}
-                        className={`w-full md:w-auto px-4 py-2 rounded-lg font-bold text-sm transition-colors border ${
-                          product.is_available 
-                            ? 'bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border-red-500/30' 
-                            : 'bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white border-green-500/30'
-                        }`}
-                      >
-                        {product.is_available ? 'Mark Out of Stock' : 'Mark Available'}
-                      </button>
-                    )}
+                    </details>
                   </div>
                 </div>
               ))}
