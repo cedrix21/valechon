@@ -293,7 +293,7 @@ export default function App() {
         {/* CENTER: ITEM GRID */}
         <div className="flex-1 overflow-y-auto">
                     {/* Fluid Grid: Fits as many 240px cards as possible */}
-          <div className="grid grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 lg:gap-5 content-start pb-24 lg:pb-6 lg:p-3 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 lg:gap-4 content-start pb-24 lg:pb-6 lg:p-3 w-full">
             {categories.find(c => c.id === activeCategory)?.products.map(product => {
               // Check if the item is a Lechon item
               const isLechon = product.name.toLowerCase().includes('lechon') && !product.is_weighted;
@@ -356,8 +356,8 @@ export default function App() {
                       />
                     </div>
                     <div className="p-3 lg:p-4 text-center bg-[#2a2a32] border-t border-[#353540]">
-                      <span className="font-bold text-sm lg:text-xl text-white block mb-1 lg:mb-2 leading-tight">{product.name}</span>
-                      <span className="text-yellow-500 font-extrabold text-lg lg:text-2xl">
+                      <span className="font-bold text-sm lg:text-lg text-white block mb-1 lg:mb-1 leading-tight">{product.name}</span>
+                      <span className="text-yellow-500 font-extrabold text-lg lg:text-xl">
                         ₱{product.is_weighted ? `${parseFloat(product.price)}/kg` : parseFloat(product.price).toFixed(2)}
                       </span>
                     </div>
