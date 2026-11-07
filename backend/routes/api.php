@@ -53,6 +53,8 @@ Route::post('/admin/products', function (Request $request) {
         'category_id' => 'required|exists:categories,id',
         'price' => 'required|numeric|min:0',
         'is_weighted' => 'required|boolean',
+        'size' => 'nullable|string',
+        'is_free_with_combo' => 'required|boolean',
         'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048' // Max 2MB
     ]);
 
@@ -67,6 +69,8 @@ Route::post('/admin/products', function (Request $request) {
         'category_id' => $validated['category_id'],
         'price' => $validated['price'],
         'is_weighted' => $validated['is_weighted'],
+        'size' => $validated['size'] ?? null,
+        'is_free_with_combo' => $validated['is_free_with_combo'],
         'image_path' => $imagePath,
         'is_available' => true,
         'modifier_stock' => ['Spicy' => true, 'Regular' => true]
@@ -83,6 +87,8 @@ Route::post('/admin/products/{id}/update', function (Request $request, $id) {
         'category_id' => 'required|exists:categories,id',
         'price' => 'required|numeric|min:0',
         'is_weighted' => 'required|boolean',
+        'size' => 'nullable|string',
+        'is_free_with_combo' => 'required|boolean',
         'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
     ]);
 
@@ -99,6 +105,8 @@ Route::post('/admin/products/{id}/update', function (Request $request, $id) {
     $product->category_id = $validated['category_id'];
     $product->price = $validated['price'];
     $product->is_weighted = $validated['is_weighted'];
+    $product->size = $validated['size'] ?? null;
+    $product->is_free_with_combo = $validated['is_free_with_combo'];
     $product->save();
 
     return response()->json($product, 200);

@@ -380,9 +380,19 @@ export default function App() {
                 <button onClick={() => confirmModifier('Spicy')} disabled={modifierModalItem.modifier_stock && !modifierModalItem.modifier_stock.Spicy} className="flex-1 bg-[#7b1e23] text-white font-bold py-6 rounded-xl hover:bg-[#5a1519] border-2 border-transparent hover:border-red-400 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed">{modifierModalItem.modifier_stock && !modifierModalItem.modifier_stock.Spicy ? 'Spicy (Out of Stock)' : 'Spicy'}</button>
               </div>
             ) : modifierModalItem.type === 'combo' && comboStep === 'drink' ? (
-              <div className="flex gap-4 mb-4">
-                <button onClick={() => confirmModifier('Coke')} className="flex-1 bg-[#353540] text-white font-bold py-6 rounded-xl hover:bg-[#404050] border-2 border-transparent hover:border-gray-400 transition-all text-lg">Coke</button>
-                <button onClick={() => confirmModifier('Royal')} className="flex-1 bg-[#353540] text-white font-bold py-6 rounded-xl hover:bg-[#404050] border-2 border-transparent hover:border-gray-400 transition-all text-lg">Royal</button>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {categories.find(c => c.name === 'Drinks')?.products.filter(p => p.is_free_with_combo).map(drink => (
+                  <button 
+                    key={drink.id} 
+                    onClick={() => confirmModifier(drink.name)} 
+                    className="flex-1 bg-[#353540] text-white font-bold py-6 rounded-xl hover:bg-[#404050] border-2 border-transparent hover:border-gray-400 transition-all text-lg"
+                  >
+                    {drink.name} {drink.size ? `(${drink.size})` : ''}
+                  </button>
+                ))}
+                {categories.find(c => c.name === 'Drinks')?.products.filter(p => p.is_free_with_combo).length === 0 && (
+                  <p className="text-gray-500 col-span-2 text-center py-4">No free drinks available.</p>
+                )}
               </div>
             ) : (
               <div className="flex gap-4 mb-4">

@@ -17,9 +17,12 @@ class Product extends Model
         'is_available',
         'modifier_stock',
         'image_path',
+        'size', 
+        'is_free_with_combo'
     ];
     protected $casts = [
         'modifier_stock' => 'array',
+        'is_free_with_combo' => 'boolean',
     ];
 
     public function category()

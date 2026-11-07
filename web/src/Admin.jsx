@@ -12,7 +12,9 @@ export default function Admin() {
     name: '',
     category_id: '',
     price: '',
-    is_weighted: false
+    is_weighted: false,
+    size: '', 
+    is_free_with_combo: false 
   });
 
   // Simple Auth Check
@@ -90,6 +92,8 @@ export default function Admin() {
     formData.append('category_id', newProduct.category_id);
     formData.append('price', newProduct.price);
     formData.append('is_weighted', newProduct.is_weighted ? 1 : 0);
+    formData.append('size', newProduct.size || '');
+    formData.append('is_free_with_combo', newProduct.is_free_with_combo ? 1 : 0);
     
     if (newProduct.image) {
       formData.append('image', newProduct.image);
@@ -108,12 +112,21 @@ export default function Admin() {
       });
       if (response.ok) {
         setIsAddModalOpen(false);
-        setNewProduct({ name: '', category_id: '', price: '', is_weighted: false, image: null });
-        setEditingProductId(null); // Reset the editing state
-        fetchProducts(); // Refresh the list
+        setNewProduct({ name: '', category_id: '', price: '', is_weighted: false, size: '', is_free_with_combo: false, image: null });
+        setEditingProductId(null); 
+        fetchProducts(); 
+      } else {
+        const errorData = await response.json();
+        // Show the exact error on screen
+        const errorMessage = errorData.errors 
+          ? Object.values(errorData.errors).flat().join('\n') 
+          : errorData.message;
+        alert("Validation Error:\n" + errorMessage);
+        console.error("Laravel Error:", errorData);
       }
     } catch (error) {
-      console.error("Error saving product:", error);
+      console.error("Network Error:", error);
+      alert("Network error. Check console.");
     }
   };
 
@@ -124,7 +137,9 @@ export default function Admin() {
       category_id: product.category_id,
       price: product.price,
       is_weighted: product.is_weighted,
-      image: null // Leave null unless a new image is selected
+      size: product.size || '',
+      is_free_with_combo: product.is_free_with_combo || false,
+      image: null
     });
     setIsAddModalOpen(true);
   };
@@ -174,7 +189,11 @@ export default function Admin() {
           <div className="flex justify-between items-center mb-4 md:mb-6 border-b border-[#353540] pb-3">
             <h2 className="text-lg md:text-xl font-bold text-gray-200">Menu Management</h2>
             <button 
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={() => {
+                setEditingProductId(null);
+                setNewProduct({ name: '', category_id: '', price: '', is_weighted: false, size: '', is_free_with_combo: false, image: null });
+                setIsAddModalOpen(true);
+              }}
               className="bg-green-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm shadow-md"
             >
               + Add Product
@@ -282,7 +301,7 @@ export default function Admin() {
             {/* ADD/EDIT PRODUCT MODAL */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-          <div className="bg-[#2a2a32] rounded-2xl shadow-2xl w-full max-w-md border border-[#404050]">
+          <div className="bg-[#2a2a32] rounded-2xl shadow-2xl w-full max-w-2xl border border-[#404050] max-h-[90vh] flex flex-col">
             
             <div className="bg-[#1e1e24] p-4 flex justify-between items-center border-b border-[#353540] rounded-t-2xl">
               <h2 className="text-xl font-bold text-white">
@@ -291,7 +310,7 @@ export default function Admin() {
               <button onClick={() => { setIsAddModalOpen(false); setEditingProductId(null); }} className="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="p-6 space-y-4">
+            <form onSubmit={handleSaveProduct} className="p-4 space-y-3 overflow-y-auto flex-1">
               
               {/* Product Name */}
               <div>
@@ -321,30 +340,58 @@ export default function Admin() {
                 </select>
               </div>
 
-              {/* Price */}
-              <div>
-                <label className="block text-gray-400 font-bold mb-1 text-sm">Price (₱)</label>
-                <input 
-                  type="number" step="0.01" required
-                  className="w-full bg-[#1e1e24] border border-[#404050] rounded-xl p-3 text-white focus:border-yellow-500 focus:outline-none"
-                  placeholder="0.00"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-                />
+                            {/* Price and Size Side-by-Side */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-400 font-bold mb-1 text-sm">Price (₱)</label>
+                  <input 
+                    type="number" step="0.01" required
+                    className="w-full bg-[#1e1e24] border border-[#404050] rounded-xl p-2 text-white focus:border-yellow-500 focus:outline-none"
+                    placeholder="0.00"
+                    value={newProduct.price}
+                    onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 font-bold mb-1 text-sm">Size (Optional)</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-[#1e1e24] border border-[#404050] rounded-xl p-2 text-white focus:border-yellow-500 focus:outline-none"
+                    placeholder="e.g. 8oz, 12oz"
+                    value={newProduct.size}
+                    onChange={(e) => setNewProduct({...newProduct, size: e.target.value})}
+                  />
+                </div>
               </div>
 
-              {/* Weight Toggle */}
-              <div className="flex items-center gap-3 bg-[#1e1e24] p-3 rounded-xl border border-[#404050]">
-                <input 
-                  type="checkbox" 
-                  id="is_weighted"
-                  className="w-5 h-5 accent-yellow-500"
-                  checked={newProduct.is_weighted}
-                  onChange={(e) => setNewProduct({...newProduct, is_weighted: e.target.checked})}
-                />
-                <label htmlFor="is_weighted" className="text-sm text-gray-300 font-semibold cursor-pointer">
-                  Sell by weight (e.g. per kg)?
-                </label>
+
+                            {/* Checkboxes Side-by-Side */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 bg-[#1e1e24] p-2 rounded-xl border border-[#404050]">
+                  <input 
+                    type="checkbox" 
+                    id="is_free_with_combo"
+                    className="w-5 h-5 accent-yellow-500"
+                    checked={newProduct.is_free_with_combo}
+                    onChange={(e) => setNewProduct({...newProduct, is_free_with_combo: e.target.checked})}
+                  />
+                  <label htmlFor="is_free_with_combo" className="text-xs text-gray-300 font-semibold cursor-pointer">
+                    Free with Combo?
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-3 bg-[#1e1e24] p-2 rounded-xl border border-[#404050]">
+                  <input 
+                    type="checkbox" 
+                    id="is_weighted"
+                    className="w-5 h-5 accent-yellow-500"
+                    checked={newProduct.is_weighted}
+                    onChange={(e) => setNewProduct({...newProduct, is_weighted: e.target.checked})}
+                  />
+                  <label htmlFor="is_weighted" className="text-xs text-gray-300 font-semibold cursor-pointer">
+                    Sell by weight?
+                  </label>
+                </div>
               </div>
 
               {/* Image Upload */}
