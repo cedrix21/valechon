@@ -99,4 +99,12 @@
   .pos-cart { display: flex; width: 480px; }
   .pos-cart-header h2 { font-size: 1.5rem; }
   .pos-cart-footer .total-amount { font-size: 3rem; }
+  
+  /* Make the Header colossal on Tablet */
+  .pos-header { padding: 24px 48px; gap: 20px; }
+  .pos-header h1 { font-size: 5.5rem; } /* Colossal Logo */
+  .pos-header span { font-size: 1.25rem !important; margin-top: 4px; } /* Bigger Slogan */
+  .pos-header input { font-size: 1.75rem; padding: 20px 32px; width: 480px; } /* Massive Input */
+  .pos-header button { font-size: 1.75rem; padding: 20px 56px; } /* Huge Dine-in/Takeout buttons */
+  .pos-header a { font-size: 1.5rem; padding: 16px 32px; } /* Bigger Reports/Admin buttons */
 }

@@ -175,8 +175,12 @@ export default function App() {
       {/* HEADER */}
       <header className="pos-header">
         <div className="flex items-center justify-between w-full lg:w-auto gap-3 lg:gap-6">
-          <h1 className="text-2xl lg:text-3xl 2xl:text-4xl font-black tracking-wider text-white italic drop-shadow-md">Valéchon</h1>
-          <span className="text-xs lg:text-sm font-bold text-gray-300 uppercase tracking-widest hidden lg:block mt-2">Sulit ug lamian</span>
+          {/* Group Logo and Slogan vertically */}
+          <div className="flex flex-col items-start justify-center">
+            <h1 className="text-2xl lg:text-3xl 2xl:text-4xl font-black tracking-wider text-white italic drop-shadow-md leading-none">Valéchon</h1>
+            {/* Added pl-1 lg:pl-0 and 2xl:pl-2 to align with the italic V */}
+            <span className="text-xs lg:text-sm font-bold text-gray-300 uppercase tracking-widest hidden lg:block mt-1 pl-1 lg:pl-0 2xl:pl-2">Sulit ug lamian</span>
+          </div>
           <div className="flex gap-2 ml-auto lg:ml-4">
              <a href="/report" target="_blank" className="text-xs lg:text-sm bg-[#5a1519] text-yellow-500 px-3 lg:px-5 py-1.5 lg:py-2.5 rounded-lg border border-yellow-500 hover:bg-[#4a1014] transition-colors font-bold tracking-wide shadow-sm">REPORTS</a>
              <a href="/admin" target="_blank" className="text-xs lg:text-sm bg-[#353540] text-gray-300 px-3 lg:px-5 py-1.5 lg:py-2.5 rounded-lg border border-[#404050] hover:bg-[#404050] transition-colors font-bold tracking-wide shadow-sm">ADMIN</a>
