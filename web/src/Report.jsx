@@ -22,7 +22,7 @@ export default function Report() {
 
   // Fetch data whenever dates change
   useEffect(() => {
-    fetch(`http://192.168.100.96:8000/api/reports/daily?start_date=${startDate}&end_date=${endDate}`)
+    fetch(`/api/reports/daily?start_date=${startDate}&end_date=${endDate}`)
       .then(res => {
         if (!res.ok) throw new Error("Server error");
         return res.json();
