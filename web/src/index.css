@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #print-receipt, #print-receipt * {
+    visibility: visible;
+  }
+  #print-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: block !important;
+  }
+}
+html, body {
+  overscroll-behavior-y: none; /* Stops the bounce effect on mobile */
+}
