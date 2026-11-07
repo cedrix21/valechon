@@ -112,3 +112,9 @@ Route::post('/admin/products/{id}/update', function (Request $request, $id) {
     return response()->json($product, 200);
 });
 
+// Soft Delete a product
+Route::delete('/admin/products/{id}', function ($id) {
+    $product = Product::findOrFail($id);
+    $product->delete(); // Soft delete
+    return response()->json(['message' => 'Product archived successfully']);
+});

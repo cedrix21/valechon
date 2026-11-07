@@ -5,9 +5,10 @@ export default function Admin() {
   const [products, setProducts] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-    const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [editingProductId, setEditingProductId] = useState(null); // Tracks if we are editing
+  const [deleteModalProduct, setDeleteModalProduct] = useState(null);
+  const [editingProductId, setEditingProductId] = useState(null); // Tracks if we are editing
   const [newProduct, setNewProduct] = useState({
     name: '',
     category_id: '',
@@ -127,6 +128,24 @@ export default function Admin() {
     } catch (error) {
       console.error("Network Error:", error);
       alert("Network error. Check console.");
+    }
+  };
+
+    const handleDeleteProduct = async () => {
+    if (!deleteModalProduct) return;
+    try {
+      const response = await fetch(`http://192.168.0.102:8000/api/admin/products/${deleteModalProduct.id}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        setProducts(products.filter(p => p.id !== deleteModalProduct.id));
+        setDeleteModalProduct(null);
+      } else {
+        alert("Failed to archive product.");
+      }
+    } catch (error) {
+      console.error("Error archiving product:", error);
     }
   };
 
@@ -254,6 +273,14 @@ export default function Admin() {
                       className="w-full md:w-auto px-3 py-2 rounded-lg text-sm font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30 hover:bg-blue-500 hover:text-white transition-colors"
                     >
                       Edit
+                    </button>
+
+                    {/* Archive Button */}
+                    <button 
+                      onClick={() => setDeleteModalProduct(product)}
+                      className="w-full md:w-auto px-3 py-2 rounded-lg text-sm font-bold bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white transition-colors"
+                    >
+                      Archive
                     </button>
 
                     {product.name.toLowerCase().includes('lechon') || product.name.toLowerCase().includes('combo') || product.name.toLowerCase().includes('roll') ? (
@@ -385,18 +412,28 @@ export default function Admin() {
               <div className="grid grid-cols-2 gap-4">
                 {(() => {
                   const isFreeSize = ['8oz', '330ml', '230ml'].includes(newProduct.size);
+                  const isUpgradeSize = ['12oz', '1000ml'].includes(newProduct.size); // Added 1000ml here
+                  const isDisabled = isFreeSize || isUpgradeSize; 
+                  
                   return (
-                    <div className={`flex items-center gap-3 p-2 rounded-xl border border-[#404050] ${isFreeSize ? 'bg-green-900/20 opacity-70' : 'bg-[#1e1e24]'}`}>
+                    <div className={`flex items-center gap-3 p-2 rounded-xl border border-[#404050] ${
+                      isFreeSize ? 'bg-green-900/20 opacity-70' : 
+                      isUpgradeSize ? 'bg-red-900/20 opacity-70' : 'bg-[#1e1e24]'
+                    }`}>
                       <input 
                         type="checkbox" 
                         id="is_free_with_combo"
                         className="w-5 h-5 accent-yellow-500 disabled:opacity-50"
                         checked={newProduct.is_free_with_combo}
-                        disabled={isFreeSize}
+                        disabled={isDisabled}
                         onChange={(e) => setNewProduct({...newProduct, is_free_with_combo: e.target.checked})}
                       />
-                      <label htmlFor="is_free_with_combo" className={`text-xs font-semibold ${isFreeSize ? 'text-green-400' : 'text-gray-300'}`}>
-                        {isFreeSize ? `Auto-Free (${newProduct.size})` : 'Free with Combo?'}
+                      <label htmlFor="is_free_with_combo" className={`text-xs font-semibold ${
+                        isFreeSize ? 'text-green-400' : 
+                        isUpgradeSize ? 'text-red-400' : 'text-gray-300'
+                      }`}>
+                        {isFreeSize ? `Auto-Free (${newProduct.size})` : 
+                         isUpgradeSize ? `Paid Upgrade (${newProduct.size})` : 'Free with Combo?'}
                       </label>
                     </div>
                   );
@@ -445,6 +482,37 @@ export default function Admin() {
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ARCHIVE CONFIRMATION MODAL */}
+      {deleteModalProduct && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] backdrop-blur-sm p-4">
+          <div className="bg-[#2a2a32] rounded-2xl shadow-2xl w-full max-w-sm border border-[#404050] text-center p-6">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+              <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Archive Product?</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Are you sure you want to archive <strong className="text-white">{deleteModalProduct.name}</strong>? It will be hidden from the POS and Menu, but past sales reports will still show its data.
+            </p>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setDeleteModalProduct(null)}
+                className="flex-1 bg-[#353540] text-white font-bold py-3 rounded-xl hover:bg-[#404050] transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteProduct}
+                className="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 transition-colors"
+              >
+                Yes, Archive
+              </button>
+            </div>
           </div>
         </div>
       )}
